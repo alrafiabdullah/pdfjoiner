@@ -1,0 +1,23 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}
+PDF Joiner
+{% endblock title %}
+
+{% block script %}
+<script src="{% static 'main/index.js' %}"></script>
+{% endblock script %}
+
+{% block bodyblock %}
+<form id="pdfForm" method="POST">
+        {% csrf_token %}
+    <small>Enter the name of the joined PDF file.</small>
+    <input type="text" id="title" class="form-control" placeholder="PDF Title" required>
+     <br>
+    <input type="file" multiple required>
+    <input type="submit" class="btn btn-primary mt-4">
+</form>
+<br> <br>
+<a href="{% url 'view' %}"><button>Click</button></a>
+{% endblock bodyblock %}
