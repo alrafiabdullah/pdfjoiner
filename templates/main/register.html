@@ -1,12 +1,14 @@
 {% extends 'main/base.html' %}
 
 {% block bodyblock %}
-
-<form action="{% url 'login' %}" method="POST">
+<form action="{% url 'register' %}" method="POST">
     {% csrf_token %}
     <input type="text" name="username" placeholder="username" class="form-control">
+    <input type="email" name="email" placeholder="email" class="form-control">
     <input type="password" name="password" placeholder="password" class="form-control">
+    <input type="password" name="password2" placeholder="re-enter password" class="form-control">
     <input type="submit" class="btn btn-primary mt-4">
 </form>
-<p>New here? <a href="{% url 'register' %}">Register</a></p>
+
+<p>Have an account? <a href="{% url 'login' %}">Login</a></p>
 {% endblock bodyblock %}

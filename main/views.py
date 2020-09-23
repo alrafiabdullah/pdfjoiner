@@ -17,7 +17,6 @@ import time
 # Create your views here.
 
 
-@login_required
 def index(request):
     csrf_token = get_token(request)
     return render(request, 'main/index.html')
@@ -31,15 +30,32 @@ def user_login(request):
 
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(reverse('index'))
+            return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "main/login.html")
-    return render(request, 'main/login.html')
+    return render(request, "main/login.html")
 
 
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('login'))
+
+
+def user_register(request):
+    if request.method == "POST":
+        username = request.POST["username"]
+        email = request.POST["email"]
+        password = request.POST["password"]
+        confirmation = request.POST["password2"]
+        if password != confirmation:
+            return render(request, "main/register.html")
+
+        user = User.objects.create_user(username, email, password)
+        user.save()
+
+        login(request, user)
+        return HttpResponseRedirect(reverse("index"))
+    return render(request, "main/register.html")
 
 
 class PDFHandlerView(View):

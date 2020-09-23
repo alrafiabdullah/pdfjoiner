@@ -22,6 +22,8 @@ PDF Joiner
     </form>
     <br>
     <a href="{% url 'logout' %}"><button>Logout</button></a>
-
+{% else %}
+    <p>Login <a href="{% url 'login' %}">Here</a></p>
+    <p>Register <a href="{% url 'register' %}">Here</a></p>
 {% endif %}
 {% endblock bodyblock %}
