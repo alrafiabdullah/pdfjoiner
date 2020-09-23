@@ -1,0 +1,14 @@
+{% extends 'main/base.html' %}
+
+{% block bodyblock %}
+    {% for pdf in pdfs %}
+        <ul>
+            <li><a target="_blank" href="media/{{pdf.pdf_file}}">{{pdf.name}}</a></li>
+            <li>{{pdf.created_at | timesince}} ago.</li>
+            <li><a href="{% url 'delete' pdf.id %}"><button class="btn btn-danger">Delete</button></a></li>
+        </ul>
+    {% empty %}
+        <h3>You have no PDF to show!</h3>
+    {% endfor %}
+    <a href="{% url 'index' %}"><button class="btn btn-primary">Back</button></a>
+{% endblock bodyblock %}

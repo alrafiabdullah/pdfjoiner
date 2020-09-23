@@ -58,6 +58,22 @@ def user_register(request):
     return render(request, "main/register.html")
 
 
+def user_pdf(request):
+    all_pdf = FileSet.objects.filter(user=request.user)
+
+    return render(request, "main/userpdf.html", {"pdfs": all_pdf})
+
+
+def pdf_delete(request, id):
+
+    pdf = FileSet.objects.get(id=id)
+    if os.path.exists(f'media/{pdf.name}.pdf'):
+        os.remove(f'media/{pdf.name}.pdf')
+    pdf.delete()
+
+    return HttpResponseRedirect(reverse('pdfs'))
+
+
 class PDFHandlerView(View):
 
     def post(self, request):
@@ -79,13 +95,11 @@ class PDFHandlerView(View):
 
             if os.path.exists(f'media/{title}.pdf'):
                 FileSet.objects.create(
+                    user=request.user,
+                    name=title,
                     pdf_file=f'{title}.pdf'
                 )
 
-            # if os.path.exists(f'media/{title}.pdf'):
-            #     time.sleep(10)
-            #     os.remove(f'media/{title}.pdf')
-
-        return JsonResponse({
-            'message': "There's nothing!"
-        }, content_type="application/json", status=200)
+        return render(request, "main/index.html", {
+            "message": "Check your PDF!"
+        })

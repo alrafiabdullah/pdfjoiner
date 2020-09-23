@@ -10,18 +10,22 @@ PDF Joiner
 {% endblock script %}
 
 {% block bodyblock %}
-
+{% if message %}
+    {{message}}
+{% endif %}
 {% if request.user.is_authenticated %}
+    <a href="{% url 'pdfs' %}"><button class="btn btn-info">PDF</button></a>
     <form id="pdfForm" method="POST">
         {% csrf_token %}
         <small>Enter the name of the joined PDF file.</small>
-        <input type="text" id="title" class="form-control" placeholder="PDF Title" required>
+        <input type="text" id="title" class="form-control" placeholder="PDF Title">
         <br>
-        <input type="file" multiple required>
-        <input type="submit" class="btn btn-primary mt-4">
+        <small>Only .jpg and .jpeg format photos are supported</small>
+        <input type="file" multiple>
+        <input type="submit" class="btn btn-primary mt-4" value="Create">
     </form>
     <br>
-    <a href="{% url 'logout' %}"><button>Logout</button></a>
+    <a href="{% url 'logout' %}"><button class="btn btn-danger">Logout</button></a>
 {% else %}
     <p>Login <a href="{% url 'login' %}">Here</a></p>
     <p>Register <a href="{% url 'register' %}">Here</a></p>

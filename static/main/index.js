@@ -30,8 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let formData = new FormData();
 
-  $("#pdfForm").on("submit", function (e) {
-    e.preventDefault();
+  $("#pdfForm").on("submit", function () {
     console.log("Form");
 
     formData.append("title", $("#title").val());
@@ -54,12 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
       processData: false,
       contentType: false,
       enctype: "multipart/form-data",
-      sucess: function (response) {
+      sucess: function () {
         console.log("response.message");
-
-        if (window.confirm("Nice!")) {
-          window.location.href = `http://127.0.0.1:8000/media/pdfs/${title}.pdf`;
-        }
       },
       error: function (err) {
         console.log(err.responseText);
