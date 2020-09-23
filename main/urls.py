@@ -6,9 +6,10 @@ from . import views
 
 urlpatterns = [
     # path('', views.ImageView.as_view(), name='imageform'),
-    path('', views.index, name='index'),
+    path('index', views.index, name='index'),
     path('success', views.PDFHandlerView.as_view()),
-    path('view', views.view, name='view'),
+    path('logout', views.user_logout, name='logout'),
+    path('', views.user_login, name='login'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
