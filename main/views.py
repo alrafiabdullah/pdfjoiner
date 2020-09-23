@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.middleware.csrf import get_token
@@ -6,8 +8,7 @@ from django.views.generic import View
 from django.core.files.storage import FileSystemStorage
 
 
-from .models import ImageSet
-from .forms import ImageForm
+from .models import User, FileSet
 from .functions import handle_file
 
 import img2pdf
@@ -16,23 +17,29 @@ import time
 # Create your views here.
 
 
+@login_required
 def index(request):
     csrf_token = get_token(request)
     return render(request, 'main/index.html')
 
 
-def view(request):
-    fs = FileSystemStorage()
-    filename = 'try.pdf'
-    if fs.exists(f'media/{filename}'):
-        with open(f'media/{filename}') as pdf:
-            response = HttpResponse(
-                pdf,
-                content_type='application/pdf'
-            )
-            response['Content-Disposition'] = f'inline; filename={filename}'
-            return response
-        pdf.close()
+def user_login(request):
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            return render(request, "main/login.html")
+    return render(request, 'main/login.html')
+
+
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('login'))
 
 
 class PDFHandlerView(View):
@@ -55,7 +62,7 @@ class PDFHandlerView(View):
             outputFile.close()
 
             if os.path.exists(f'media/{title}.pdf'):
-                ImageSet.objects.create(
+                FileSet.objects.create(
                     pdf_file=f'{title}.pdf'
                 )
 

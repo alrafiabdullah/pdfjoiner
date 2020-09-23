@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import ImageSet
+from .models import User, FileSet
 # Register your models here.
 
-
-admin.site.register(ImageSet)
+admin.site.register(User)
+admin.site.register(FileSet)
