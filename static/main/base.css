@@ -5,3 +5,11 @@ body {
 p {
   text-align: center;
 }
+
+#index {
+  display: none;
+}
+
+.ajaxProgress {
+  display: none;
+}

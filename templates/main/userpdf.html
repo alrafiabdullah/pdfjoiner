@@ -1,12 +1,27 @@
 {% extends 'main/base.html' %}
+{% load time_ago %}
+
+{% block title %}
+    {% if request.user.first_name %}
+        {{ request.user.first_name }}'s PDF
+    {% else %}
+        {{ request.user.username}}'s PDF
+    {% endif %}
+{% endblock title %}
 
 {% block bodyblock %}
     {% for pdf in pdfs %}
         <ul>
-            <li><a target="_blank" href="media/{{pdf.pdf_file}}">{{pdf.name}}</a></li>
+            {% if pdf.created_at|minutes_ago:5 %}
+                <small style="color: blue;"><strong>Recent Entry!</strong></small>
+            {% endif %}
+            <li><a target="_blank" href="{% url 'view' pdf.id %}">{{pdf.name}}</a></li>
             <li>{{pdf.created_at | timesince}} ago.</li>
             <li><a href="{% url 'delete' pdf.id %}"><button class="btn btn-danger">Delete</button></a></li>
         </ul>
+        {% ifnotequal forloop.revcounter 1 %}
+            ------------------------------------
+        {% endifnotequal %}
     {% empty %}
         <h3>You have no PDF to show!</h3>
     {% endfor %}

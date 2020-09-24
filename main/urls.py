@@ -11,6 +11,7 @@ urlpatterns = [
     path('register', views.user_register, name='register'),
     path('pdfs', views.user_pdf, name='pdfs'),
     path('delete/<int:id>', views.pdf_delete, name='delete'),
+    path('views/<int:id>', views.pdf_view, name='view'),
     path('success', views.PDFHandlerView.as_view()),
 ]
 

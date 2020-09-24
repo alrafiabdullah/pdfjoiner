@@ -6,20 +6,21 @@
 {% endblock script %}
 
 {% block bodyblock %}
-{% if message %}
-    {{message}}
-{% endif %}
 {% if request.user.is_authenticated %}
-    <a href="{% url 'pdfs' %}"><button class="btn btn-info">PDF</button></a>
+    <a id="checkPDF" href="{% url 'pdfs' %}"><button class="btn btn-info">Check your PDF Here</button></a>
     <form id="pdfForm" method="POST">
         {% csrf_token %}
         <small>Enter the name of the joined PDF file.</small>
-        <input type="text" id="title" class="form-control" placeholder="PDF Title">
+        <input type="text" id="title" class="form-control" placeholder="PDF Title" required>
         <br>
         <small>Only .jpg and .jpeg format photos are supported</small>
-        <input type="file" multiple>
-        <input type="submit" class="btn btn-primary mt-4" value="Create">
+        <input type="file" multiple required>
+        <input id="submit" type="submit" class="btn btn-primary mt-4" value="Create">
     </form>
+    <div class="ajaxProgress">
+        <img src="{% static 'loading.gif' %}" alt="loading...">
+    </div>
+    <div id="another"></div>
     <br>
     <a href="{% url 'logout' %}"><button class="btn btn-danger">Logout</button></a>
 {% else %}

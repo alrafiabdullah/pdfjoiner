@@ -4,8 +4,8 @@
 
 <form action="{% url 'login' %}" method="POST">
     {% csrf_token %}
-    <input type="text" name="username" placeholder="username" class="form-control">
-    <input type="password" name="password" placeholder="password" class="form-control">
+    <input type="text" name="username" placeholder="username" class="form-control" required>
+    <input type="password" name="password" placeholder="password" class="form-control" required>
     <input type="submit" class="btn btn-primary mt-4">
 </form>
 <p>New here? <a href="{% url 'register' %}">Register</a></p>

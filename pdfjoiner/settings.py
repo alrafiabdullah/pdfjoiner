@@ -30,7 +30,12 @@ if os.path.exists('secrets.json'):
     secret.close()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if socket.gethostname() == "Grenade":
+    DEBUG = True
+    ALLOWED_HOSTS = ["127.0.0.1", ]
+else:
+    DEBUG = False
+    ALLOWED_HOSTS = ["pdfjoined.herokuapp.com", ]
 
 # Application definition
 
@@ -52,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'pdfjoiner.urls'
@@ -134,7 +140,7 @@ MEDIA_URL = '/media/'
 STATICFILES_DIRS = [STATIC_DIR, ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
 # User Agents Cache
 USER_AGENTS_CACHE = 'default'

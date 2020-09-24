@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse, FileResponse
 from django.middleware.csrf import get_token
 from django.views.generic import View
 from django.core.files.storage import FileSystemStorage
@@ -59,7 +59,7 @@ def user_register(request):
 
 
 def user_pdf(request):
-    all_pdf = FileSet.objects.filter(user=request.user)
+    all_pdf = FileSet.objects.filter(user=request.user).order_by('-created_at')
 
     return render(request, "main/userpdf.html", {"pdfs": all_pdf})
 
@@ -67,11 +67,17 @@ def user_pdf(request):
 def pdf_delete(request, id):
 
     pdf = FileSet.objects.get(id=id)
-    if os.path.exists(f'media/{pdf.name}.pdf'):
-        os.remove(f'media/{pdf.name}.pdf')
+    if os.path.exists(f'mediafiles/{pdf.name}.pdf'):
+        os.remove(f'mediafiles/{pdf.name}.pdf')
     pdf.delete()
 
     return HttpResponseRedirect(reverse('pdfs'))
+
+
+def pdf_view(request, id):
+    pdf = FileSet.objects.get(id=id)
+    file_name = pdf.name
+    return FileResponse(open(f'mediafiles/{file_name}.pdf', 'rb'))
 
 
 class PDFHandlerView(View):
@@ -87,19 +93,22 @@ class PDFHandlerView(View):
             for file_num in range(0, new_length):
                 inputFile.append(request.FILES.get(f'images{file_num}'))
 
-            outputFile = open(f'media/{title}.pdf', 'wb')
+            outputFile = open(f'mediafiles/{title}.pdf', 'wb')
 
             outputFile.write(img2pdf.convert(inputFile))
 
             outputFile.close()
 
-            if os.path.exists(f'media/{title}.pdf'):
+            if os.path.exists(f'mediafiles/{title}.pdf'):
                 FileSet.objects.create(
                     user=request.user,
                     name=title,
                     pdf_file=f'{title}.pdf'
                 )
 
-        return render(request, "main/index.html", {
-            "message": "Check your PDF!"
-        })
+            return JsonResponse({
+                'message': "There's nothing!"
+            }, content_type="application/json", status=200)
+        return JsonResponse({
+            'message': "Sad"
+        }, content_type="application/json", status=400)

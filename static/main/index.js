@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   FilePond.setOptions({
     allowMultiple: true,
     maxFiles: 5,
-    maxFileSize: "10mb",
+    maxFileSize: "20mb",
   });
 
   const inputElement = document.querySelector('input[type="file"]');
@@ -30,8 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let formData = new FormData();
 
-  $("#pdfForm").on("submit", function () {
+  $("#pdfForm").on("submit", function (e) {
     console.log("Form");
+    e.preventDefault();
 
     formData.append("title", $("#title").val());
     formData.append("length", files.length);
@@ -45,16 +46,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const title = $("#title").val();
 
+    $("#submit").hide();
+    $(".ajaxProgress").show();
     $.ajax({
       type: "POST",
-      url: "success",
+      url: "/success",
       data: formData,
       cache: false,
       processData: false,
       contentType: false,
       enctype: "multipart/form-data",
-      sucess: function () {
-        console.log("response.message");
+      success: function (response) {
+        console.log(response.message);
+        $(".ajaxProgress").hide();
+        $("#pdfForm").hide();
+        const another = document.querySelector("#another");
+        another.innerHTML = `<h3>Your PDF is ready!<br>Please click on the button above^</h3>`;
+        another.style.display = "block";
       },
       error: function (err) {
         console.log(err.responseText);

@@ -3,5 +3,18 @@ from django.contrib import admin
 from .models import User, FileSet
 # Register your models here.
 
-admin.site.register(User)
-admin.site.register(FileSet)
+
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'is_staff', 'is_paid')
+    list_filter = ('is_paid', ('date_joined'),)
+    search_fields = ['username']
+
+
+class FileSetAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at',)
+    list_filter = ('created_at',)
+    search_fields = ['name']
+
+
+admin.site.register(User, UserAdmin)
+admin.site.register(FileSet, FileSetAdmin)
