@@ -1,0 +1,15 @@
+body {
+  margin: 5%;
+}
+
+p {
+  text-align: center;
+}
+
+#index {
+  display: none;
+}
+
+.ajaxProgress {
+  display: none;
+}
