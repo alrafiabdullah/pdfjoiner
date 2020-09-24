@@ -138,3 +138,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # User Agents Cache
 USER_AGENTS_CACHE = 'default'
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
