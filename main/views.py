@@ -7,7 +7,9 @@ from django.middleware.csrf import get_token
 from django.views.generic import View
 from django.core.files.storage import FileSystemStorage
 from django.db import IntegrityError
-from django.contrib import messages
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.template.loader import render_to_string
 
 from .models import User, FileSet
 
@@ -59,7 +61,7 @@ def user_register(request):
             user.save()
         except IntegrityError as e:
             return render(request, "main/register.html", {
-                "message": "Username is alredy taken",
+                "message": "Username/Email is alredy taken",
             })
 
         login(request, user)
@@ -115,6 +117,28 @@ def user_edit(request):
         user.save()
         return HttpResponseRedirect(reverse("profile"))
     return render(request, "main/edit.html")
+
+
+def send_mail(request):
+    all_email = []
+    all_user = User.objects.all()
+    for user in all_user:
+        all_email.append(user.email)
+
+    if request.method == "POST":
+        subject = request.POST["subject"]
+        body = request.POST["body"]
+
+        email_message = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=settings.EMAIL_HOST_USER,
+            bcc=all_email
+        )
+        email_message.send()
+        return HttpResponseRedirect(reverse("index"))
+
+    return render(request, "main/email.html")
 
 
 class PDFHandlerView(View):
