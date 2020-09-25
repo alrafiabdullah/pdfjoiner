@@ -6,7 +6,7 @@
 {% endif %}
 <form action="{% url 'register' %}" method="POST">
     {% csrf_token %}
-    <input type="text" name="username" placeholder="username" class="form-control" required>
+    <input type="text" name="username" placeholder="username" class="form-control" required autofocus>
     <input type="email" name="email" placeholder="email" class="form-control" required>
     <input type="password" name="password" placeholder="password" class="form-control" required>
     <input type="password" name="password2" placeholder="re-enter password" class="form-control" required>
