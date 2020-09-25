@@ -89,6 +89,34 @@ def pdf_view(request, id):
     return FileResponse(open(f'mediafiles/{file_name}.pdf', 'rb'))
 
 
+def user_profile(request):
+    user_pdfs = FileSet.objects.filter(user=request.user)
+    if request.method == "POST":
+        first_name = request.POST["firstName"]
+        last_name = request.POST["lastName"]
+
+        user = request.user
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+        return HttpResponseRedirect(reverse("profile"))
+
+    return render(request, "main/profile.html", {
+        "user_pdfs": user_pdfs
+    })
+
+
+def user_edit(request):
+    if request.method == "POST":
+        user = request.user
+        email = request.POST["email"]
+        user.email = email
+
+        user.save()
+        return HttpResponseRedirect(reverse("profile"))
+    return render(request, "main/edit.html")
+
+
 class PDFHandlerView(View):
 
     def post(self, request):
