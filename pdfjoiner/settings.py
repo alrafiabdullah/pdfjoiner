@@ -148,3 +148,10 @@ MEDIA_ROOT = BASE_DIR / 'mediafiles'
 USER_AGENTS_CACHE = 'default'
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+EMAIL_HOST = data["EMAIL_HOST"]
+EMAIL_HOST_USER = data["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = data["EMAIL_HOST_PASSWORD"]
+EMAIL_PORT = data["EMAIL_PORT"]
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
