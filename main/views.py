@@ -59,6 +59,15 @@ def user_register(request):
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
+            body = render_to_string(
+                "email/email.html", {"user_name": username})
+            email_message = EmailMessage(
+                subject=f"Welcome To PDF Joiner, {username}!",
+                body=body,
+                from_email=settings.EMAIL_HOST_USER,
+                to=[email]
+            )
+            email_message.send()
         except IntegrityError as e:
             return render(request, "main/register.html", {
                 "message": "Username/Email is alredy taken",
