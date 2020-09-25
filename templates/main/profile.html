@@ -1,0 +1,41 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+    {% if request.user.first_name %}
+        {{ request.user.first_name }} | Profile
+    {% else %}
+        {{ request.user.username}} | Profile
+    {% endif %}
+{% endblock title %}
+
+{% block bodyblock %}
+    <h3>Welcome to your profile {{ request.user.username }}!</h3>
+    <h5>Total PDF Count: <a href="{% url 'pdfs' %}"><strong>{{ user_pdfs|length }}</strong></a></h5>
+    {% if request.user.first_name %}
+        <a href="{% url 'edit' %}"><button class="btn btn-info">Edit Profile</button></a> <br>
+        First Name: {{ request.user.first_name }} <br>
+        Last Name: {{ request.user.last_name }} <br>
+    {% else %}
+        <form action="{% url 'profile' %}" method="POST">
+            {% csrf_token %}
+            <input class="form-control" type="text" name="firstName" placeholder="first name" required autofocus>
+            <input class="form-control" type="text" name="lastName" placeholder="last name" required>
+            <input class="btn btn-primary" type="submit">
+        </form>
+    {% endif %}
+    Email: {{ request.user.email }} <br>
+    Date Joined: {{ request.user.date_joined }} | {{ request.user.date_joined|timesince }} ago <br>
+    Currently Using:
+    {% if request.user_agent.is_mobile %}
+        <ul>
+        <li>Browser: <strong><i>{{ request.user_agent.browser.family }}</i></strong></li>
+        <li>Operating System: <strong><i>{{ request.user_agent.os.family }} {{ request.user_agent.os.version_string }}</i></strong></li>
+            <li>Device: <strong><i>{{ request.user_agent.device.family }}</i></strong></li>
+        </ul>
+    {% else %}
+        <li>Browser: <strong><i>{{ request.user_agent.browser.family }}</i></strong></li>
+        <li>Operating System: <strong><i>{{ request.user_agent.os.family }} {{ request.user_agent.os.version_string }}</i></strong></li>
+        <li>Device: <strong><i>Desktop/Other</i></strong></li>
+    {% endif %}
+    <a href="{% url 'index' %}"><button class="btn btn-primary">Back</button></a>
+{% endblock bodyblock %}
