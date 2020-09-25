@@ -1,7 +1,11 @@
 {% extends 'main/base.html' %}
 
 {% block bodyblock %}
-
+<div>
+    {% if message%}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endif %}
+</div>
 <form action="{% url 'login' %}" method="POST">
     {% csrf_token %}
     <input type="text" name="username" placeholder="username" class="form-control" required>

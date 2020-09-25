@@ -11,5 +11,5 @@ class User(AbstractUser):
 class FileSet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    pdf_file = models.FileField(upload_to='')
+    pdf_file = models.FileField(upload_to='', unique=False)
     created_at = models.DateTimeField(auto_now=True)

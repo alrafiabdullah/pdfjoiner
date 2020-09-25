@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
@@ -6,10 +6,10 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse, FileRe
 from django.middleware.csrf import get_token
 from django.views.generic import View
 from django.core.files.storage import FileSystemStorage
-
+from django.db import IntegrityError
+from django.contrib import messages
 
 from .models import User, FileSet
-from .functions import handle_file
 
 import img2pdf
 import os
@@ -32,7 +32,9 @@ def user_login(request):
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "main/login.html")
+            return render(request, "main/login.html", {
+                "message": "Incorrect username/password"
+            })
     return render(request, "main/login.html")
 
 
@@ -48,10 +50,17 @@ def user_register(request):
         password = request.POST["password"]
         confirmation = request.POST["password2"]
         if password != confirmation:
-            return render(request, "main/register.html")
+            return render(request, "main/register.html", {
+                "message": "Password mismatch"
+            })
 
-        user = User.objects.create_user(username, email, password)
-        user.save()
+        try:
+            user = User.objects.create_user(username, email, password)
+            user.save()
+        except IntegrityError as e:
+            return render(request, "main/register.html", {
+                "message": "Username is alredy taken",
+            })
 
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
@@ -75,7 +84,7 @@ def pdf_delete(request, id):
 
 
 def pdf_view(request, id):
-    pdf = FileSet.objects.get(id=id)
+    pdf = get_object_or_404(FileSet, id=id)
     file_name = pdf.name
     return FileResponse(open(f'mediafiles/{file_name}.pdf', 'rb'))
 
@@ -99,12 +108,17 @@ class PDFHandlerView(View):
 
             outputFile.close()
 
-            if os.path.exists(f'mediafiles/{title}.pdf'):
-                FileSet.objects.create(
-                    user=request.user,
-                    name=title,
-                    pdf_file=f'{title}.pdf'
-                )
+            try:
+                if os.path.exists(f'mediafiles/{title}.pdf'):
+                    FileSet.objects.create(
+                        user=request.user,
+                        name=title,
+                        pdf_file=f'{title}.pdf'
+                    )
+            except IntegrityError as e:
+                return JsonResponse({
+                    'message': "File"
+                }, content_type="application/json", status=200)
 
             return JsonResponse({
                 'message': "There's nothing!"
