@@ -143,7 +143,7 @@ STATICFILES_DIRS = [STATIC_DIR, ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_ROOT = BASE_DIR / 'mediafiles'
-
+LOGIN_URL = '/login'
 # User Agents Cache
 USER_AGENTS_CACHE = 'default'
 
