@@ -2,4 +2,4 @@
 
 ##
 
-`On Progress! You can check it live (here)[https://pdfjoined.herokuapp.com/]`
+`On Progress! You can check it live [here](https://pdfjoined.herokuapp.com/)`
