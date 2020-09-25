@@ -14,6 +14,7 @@ urlpatterns = [
     path('views/<int:id>', views.pdf_view, name='view'),
     path('profile', views.user_profile, name='profile'),
     path('profile/edit', views.user_edit, name='edit'),
+    path('send', views.send_mail, name='send'),
     path('success', views.PDFHandlerView.as_view()),
 ]
 
