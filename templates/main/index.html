@@ -13,6 +13,7 @@
 
     {% if request.user.is_superuser %}
         <a target="_blank" href="{% url 'admin:index' %}"><button class="btn btn-info">Admin</button></a>
+        <a href="{% url 'send' %}"><button class="btn btn-danger">Send Email (All)</button></a>
     {% endif %}
 
     <a href="{% url 'profile' %}"><button class="btn btn-info">Profile</button></a>
