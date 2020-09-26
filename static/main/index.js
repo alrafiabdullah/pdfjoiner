@@ -57,12 +57,24 @@ document.addEventListener("DOMContentLoaded", () => {
       contentType: false,
       enctype: "multipart/form-data",
       success: function (response) {
-        console.log(response.message);
-        $(".ajaxProgress").hide();
-        $("#pdfForm").hide();
         const another = document.querySelector("#another");
-        another.innerHTML = `<h3>Your PDF is ready!<br>Please click on the button above^</h3>`;
-        another.style.display = "block";
+
+        if (response.message === "File") {
+          $(".ajaxProgress").hide();
+          $("#submit").show();
+          another.innerHTML = `<h3 class="alert alert-danger">The title is taken. Please add another title!</h3>`;
+          another.style.display = "block";
+        } else if (response.message === "Full") {
+          $(".ajaxProgress").hide();
+          $("#submit").show();
+          another.innerHTML = `<h3 class="alert alert-danger">You have reached your limit. Please delete a PDF first!</h3>`;
+          another.style.display = "block";
+        } else {
+          $(".ajaxProgress").hide();
+          $("#pdfForm").hide();
+          another.innerHTML = `<h3 class="alert alert-success">Your PDF is ready!<br>Please click on the button above^</h3>`;
+          another.style.display = "block";
+        }
       },
       error: function (err) {
         console.log(err.responseText);

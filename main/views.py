@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
@@ -6,10 +6,13 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse, FileRe
 from django.middleware.csrf import get_token
 from django.views.generic import View
 from django.core.files.storage import FileSystemStorage
-
+from django.db import IntegrityError
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from .models import User, FileSet
-from .functions import handle_file
 
 import img2pdf
 import os
@@ -32,7 +35,9 @@ def user_login(request):
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "main/login.html")
+            return render(request, "main/login.html", {
+                "message": "Incorrect username/password"
+            })
     return render(request, "main/login.html")
 
 
@@ -48,10 +53,26 @@ def user_register(request):
         password = request.POST["password"]
         confirmation = request.POST["password2"]
         if password != confirmation:
-            return render(request, "main/register.html")
+            return render(request, "main/register.html", {
+                "message": "Password mismatch"
+            })
 
-        user = User.objects.create_user(username, email, password)
-        user.save()
+        try:
+            user = User.objects.create_user(username, email, password)
+            user.save()
+            body = render_to_string(
+                "email/email.html", {"user_name": username})
+            email_message = EmailMessage(
+                subject=f"Welcome To PDF Joiner, {username}!",
+                body=body,
+                from_email=settings.EMAIL_HOST_USER,
+                to=[email]
+            )
+            email_message.send()
+        except IntegrityError as e:
+            return render(request, "main/register.html", {
+                "message": "Username/Email is alredy taken",
+            })
 
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
@@ -61,7 +82,25 @@ def user_register(request):
 def user_pdf(request):
     all_pdf = FileSet.objects.filter(user=request.user).order_by('-created_at')
 
-    return render(request, "main/userpdf.html", {"pdfs": all_pdf})
+    paginator = Paginator(all_pdf, per_page=5)
+    page_number = request.GET.get('page', 1)
+    page = paginator.get_page(page_number)
+
+    if page.has_next():
+        next_url = f'?page={page.next_page_number()}'
+    else:
+        next_url = ''
+
+    if page.has_previous():
+        previous_url = f'?page={page.previous_page_number()}'
+    else:
+        previous_url = ''
+
+    return render(request, "main/userpdf.html", {
+        "pdfs": page,
+        "next_page_url": next_url,
+        "previous_page_url": previous_url
+    })
 
 
 def pdf_delete(request, id):
@@ -75,15 +114,71 @@ def pdf_delete(request, id):
 
 
 def pdf_view(request, id):
-    pdf = FileSet.objects.get(id=id)
+    pdf = get_object_or_404(FileSet, id=id)
     file_name = pdf.name
     return FileResponse(open(f'mediafiles/{file_name}.pdf', 'rb'))
+
+
+def user_profile(request):
+    user_pdfs = FileSet.objects.filter(user=request.user)
+    if request.method == "POST":
+        first_name = request.POST["firstName"]
+        last_name = request.POST["lastName"]
+
+        user = request.user
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+        return HttpResponseRedirect(reverse("profile"))
+
+    return render(request, "main/profile.html", {
+        "user_pdfs": user_pdfs
+    })
+
+
+def user_edit(request):
+    if request.method == "POST":
+        user = request.user
+        email = request.POST["email"]
+        user.email = email
+
+        user.save()
+        return HttpResponseRedirect(reverse("profile"))
+    return render(request, "main/edit.html")
+
+
+def send_mail(request):
+    all_email = []
+    all_user = User.objects.all()
+    for user in all_user:
+        all_email.append(user.email)
+
+    if request.method == "POST":
+        subject = request.POST["subject"]
+        body = request.POST["body"]
+
+        email_message = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=settings.EMAIL_HOST_USER,
+            bcc=all_email
+        )
+        email_message.send()
+        return HttpResponseRedirect(reverse("index"))
+
+    return render(request, "main/email.html")
 
 
 class PDFHandlerView(View):
 
     def post(self, request):
         if request.method == "POST":
+            all_pdf = FileSet.objects.filter(user=request.user)
+            if len(all_pdf) > 9:
+                return JsonResponse({
+                    'message': "Full"
+                }, content_type="application/json", status=200)
+
             length = request.POST['length']
             title = request.POST['title']
 
@@ -99,12 +194,17 @@ class PDFHandlerView(View):
 
             outputFile.close()
 
-            if os.path.exists(f'mediafiles/{title}.pdf'):
-                FileSet.objects.create(
-                    user=request.user,
-                    name=title,
-                    pdf_file=f'{title}.pdf'
-                )
+            try:
+                if os.path.exists(f'mediafiles/{title}.pdf'):
+                    FileSet.objects.create(
+                        user=request.user,
+                        name=title,
+                        pdf_file=f'{title}.pdf'
+                    )
+            except IntegrityError as e:
+                return JsonResponse({
+                    'message': "File"
+                }, content_type="application/json", status=200)
 
             return JsonResponse({
                 'message': "There's nothing!"

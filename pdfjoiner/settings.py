@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
+    'django_user_agents',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django_user_agents.middleware.UserAgentMiddleware',
 ]
 
 ROOT_URLCONF = 'pdfjoiner.urls'
@@ -141,8 +143,17 @@ STATICFILES_DIRS = [STATIC_DIR, ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_ROOT = BASE_DIR / 'mediafiles'
+LOGIN_URL = '/login'
 
 # User Agents Cache
 USER_AGENTS_CACHE = 'default'
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+DEFAULT_FROM_EMAIL = "no-reply@pdfjoined.herokuapp.com"
+EMAIL_HOST = data["EMAIL_HOST"]
+EMAIL_HOST_USER = data["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = data["EMAIL_HOST_PASSWORD"]
+EMAIL_PORT = data["EMAIL_PORT"]
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
