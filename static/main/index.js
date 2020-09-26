@@ -64,6 +64,11 @@ document.addEventListener("DOMContentLoaded", () => {
           $("#submit").show();
           another.innerHTML = `<h3 class="alert alert-danger">The title is taken. Please add another title!</h3>`;
           another.style.display = "block";
+        } else if (response.message === "Full") {
+          $(".ajaxProgress").hide();
+          $("#submit").show();
+          another.innerHTML = `<h3 class="alert alert-danger">You have reached your limit. Please delete a PDF first!</h3>`;
+          another.style.display = "block";
         } else {
           $(".ajaxProgress").hide();
           $("#pdfForm").hide();

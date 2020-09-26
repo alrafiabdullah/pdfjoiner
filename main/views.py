@@ -173,6 +173,12 @@ class PDFHandlerView(View):
 
     def post(self, request):
         if request.method == "POST":
+            all_pdf = FileSet.objects.filter(user=request.user)
+            if len(all_pdf) > 9:
+                return JsonResponse({
+                    'message': "Full"
+                }, content_type="application/json", status=200)
+
             length = request.POST['length']
             title = request.POST['title']
 

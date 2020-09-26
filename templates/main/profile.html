@@ -10,7 +10,11 @@
 
 {% block bodyblock %}
     <h3>Welcome to your profile {{ request.user.username }}!</h3>
-    <h5>Total PDF Count: <a href="{% url 'pdfs' %}"><strong>{{ user_pdfs|length }}</strong></a></h5>
+    {% if user_pdfs|length_is:"10" %}
+        <h5>Total PDF Count: <a href="{% url 'pdfs' %}"><strong style="color: red;">{{ user_pdfs|length }}/10</strong></a></h5>
+    {% else %}
+        <h5>Total PDF Count: <a href="{% url 'pdfs' %}"><strong>{{ user_pdfs|length }}/10</strong></a></h5>
+    {% endif %}
     {% if request.user.first_name %}
         <a href="{% url 'edit' %}"><button class="btn btn-info">Edit Profile</button></a> <br>
         First Name: {{ request.user.first_name }} <br>
