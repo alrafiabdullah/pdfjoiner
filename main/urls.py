@@ -18,12 +18,13 @@ urlpatterns = [
     path('send', views.send_mail, name='send'),
     path('success', views.PDFHandlerView.as_view()),
 
-    path('reset', auth_views.PasswordResetView.as_view(), name='reset_password'),
-    path('reset/sent', auth_views.PasswordResetDoneView.as_view(),
+    path('reset', auth_views.PasswordResetView.as_view(
+        template_name="reset/password_reset.html"), name='reset_password'),
+    path('reset/sent', auth_views.PasswordResetDoneView.as_view(template_name="reset/password_reset_sent.html"),
          name='password_reset_done'),
-    path('reset/<uidb64>/<token>', auth_views.PasswordResetConfirmView.as_view(),
+    path('reset/<uidb64>/<token>', auth_views.PasswordResetConfirmView.as_view(template_name="reset/password_reset_form.html"),
          name='password_reset_confirm'),
-    path('reset/complete', auth_views.PasswordResetCompleteView.as_view(),
+    path('reset/complete', auth_views.PasswordResetCompleteView.as_view(template_name="reset/password_reset_done.html"),
          name='password_reset_complete'),
 ]
 
