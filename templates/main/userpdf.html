@@ -15,8 +15,9 @@
             {% if pdf.created_at|minutes_ago:5 %}
                 <small style="color: blue;"><strong>Recent Entry!</strong></small>
             {% endif %}
-            <li><a target="_blank" href="{% url 'view' pdf.id %}">{{pdf.name}}</a></li>
-            <li>{{pdf.created_at | timesince}} ago.</li>
+            {% comment %} <li>Sl No. <b>{{ forloop.counter }}</b></li> {% endcomment %}
+            <li>Download Link: <a target="_blank" href="{% url 'view' pdf.id %}"><b>{{pdf.name}}</b></a></li>
+            <li>Created <b>{{pdf.created_at | timesince}}</b> ago.</li>
             <li><a href="{% url 'delete' pdf.id %}"><button class="btn btn-danger">Delete</button></a></li>
         </ul>
         {% ifnotequal forloop.revcounter 1 %}
@@ -25,5 +26,31 @@
     {% empty %}
         <h3>You have no PDF to show!</h3>
     {% endfor %}
+
+    <nav aria-label="...">
+        <ul class="pagination">
+            <li class="page-item" {% if not previous_page_url %} style="display: none;" {% endif %}>
+            <a class="page-link" href="{{ previous_page_url }}" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            
+            {% for n in posts.page_range %}
+                {% if posts.number == n %}
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" href="?page={{ n }}">{{n}}<span class="sr-only">(current)</span></a>
+                    </li>                        
+                {% elif n > posts.number and n < posts.number %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ n }}">1</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+
+            <li class="page-item" {% if not next_page_url %} style="display: none;" {% endif %}">
+            <a class="page-link" href="{{ next_page_url }}">Next</a>
+            </li>
+        </ul>
+    </nav>
+
     <a href="{% url 'index' %}"><button class="btn btn-primary">Back</button></a>
 {% endblock bodyblock %}

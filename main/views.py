@@ -10,6 +10,7 @@ from django.db import IntegrityError
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from .models import User, FileSet
 
@@ -81,7 +82,25 @@ def user_register(request):
 def user_pdf(request):
     all_pdf = FileSet.objects.filter(user=request.user).order_by('-created_at')
 
-    return render(request, "main/userpdf.html", {"pdfs": all_pdf})
+    paginator = Paginator(all_pdf, per_page=5)
+    page_number = request.GET.get('page', 1)
+    page = paginator.get_page(page_number)
+
+    if page.has_next():
+        next_url = f'?page={page.next_page_number()}'
+    else:
+        next_url = ''
+
+    if page.has_previous():
+        previous_url = f'?page={page.previous_page_number()}'
+    else:
+        previous_url = ''
+
+    return render(request, "main/userpdf.html", {
+        "pdfs": page,
+        "next_page_url": next_url,
+        "previous_page_url": previous_url
+    })
 
 
 def pdf_delete(request, id):
