@@ -11,8 +11,9 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core import serializers
 
-from .models import User, FileSet
+from .models import User, FileSet, Temporary
 
 import img2pdf
 import os
@@ -113,10 +114,29 @@ def pdf_delete(request, id):
     return HttpResponseRedirect(reverse('pdfs'))
 
 
+def temp_delete(request):
+    if request.method == "POST":
+        temp_id = request.POST["id"]
+        pdf = Temporary.objects.get(id=temp_id)
+        if os.path.exists(f'mediafiles/others/{pdf.name}.pdf'):
+            os.remove(f'mediafiles/others/{pdf.name}.pdf')
+        pdf.delete()
+
+    return JsonResponse({
+        'message': "File"
+    }, content_type="application/json", status=200)
+
+
 def pdf_view(request, id):
     pdf = get_object_or_404(FileSet, id=id)
     file_name = pdf.name
     return FileResponse(open(f'mediafiles/{file_name}.pdf', 'rb'))
+
+
+def temp_view(request, id):
+    pdf = get_object_or_404(Temporary, id=id)
+    file_name = pdf.name
+    return FileResponse(open(f'mediafiles/others/{file_name}.pdf', 'rb'))
 
 
 def user_profile(request):
@@ -201,14 +221,58 @@ class PDFHandlerView(View):
                         name=title,
                         pdf_file=f'{title}.pdf'
                     )
+                    latest_pdf = FileSet.objects.filter(name=f"{title}")
+                    data = serializers.serialize("json", latest_pdf)
+                    return JsonResponse({
+                        "message": "There's nothing!",
+                        "file": data,
+                    }, content_type="application/json", status=200)
+            except IntegrityError as e:
+                return JsonResponse({
+                    'message': "File"
+                }, content_type="application/json", status=200)
+        return JsonResponse({
+            'message': "Sad"
+        }, content_type="application/json", status=400)
+
+
+class TempHandlerView(View):
+
+    def post(self, request):
+        if request.method == "POST":
+
+            length = request.POST['length']
+            title = request.POST['title']
+
+            new_length = int(length)
+            inputFile = []
+
+            for file_num in range(0, new_length):
+                inputFile.append(request.FILES.get(f'images{file_num}'))
+
+            outputFile = open(f'mediafiles/others/{title}.pdf', 'wb')
+
+            outputFile.write(img2pdf.convert(inputFile))
+
+            outputFile.close()
+
+            try:
+                if os.path.exists(f'mediafiles/others/{title}.pdf'):
+                    Temporary.objects.create(
+                        name=title,
+                        pdf_file=f'{title}.pdf'
+                    )
+                    temp_file = Temporary.objects.filter(name=f"{title}")
+                    data = serializers.serialize("json", temp_file)
+                    return JsonResponse({
+                        "message": "There's nothing!",
+                        "file": data,
+                    }, content_type="application/json", status=200)
             except IntegrityError as e:
                 return JsonResponse({
                     'message': "File"
                 }, content_type="application/json", status=200)
 
-            return JsonResponse({
-                'message': "There's nothing!"
-            }, content_type="application/json", status=200)
         return JsonResponse({
             'message': "Sad"
         }, content_type="application/json", status=400)
