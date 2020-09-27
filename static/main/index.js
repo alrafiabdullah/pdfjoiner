@@ -6,8 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
   FilePond.registerPlugin(FilePondPluginFileValidateType);
   FilePond.setOptions({
     allowMultiple: true,
-    maxFiles: 5,
-    maxFileSize: "20mb",
+    maxFiles: 50,
+    maxFileSize: "10mb",
   });
 
   const inputElement = document.querySelector('input[type="file"]');
