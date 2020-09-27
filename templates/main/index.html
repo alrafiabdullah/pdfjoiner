@@ -1,13 +1,10 @@
 {% extends 'main/base.html' %}
 {% load static %}
 
-{% block script %}
-<script src="{% static 'main/index.js' %}"></script>
-{% endblock script %}
-
 {% block bodyblock %}
 
 {% if request.user.is_authenticated %}
+    <script src="{% static 'main/index.js' %}"></script>
     {% if request.user.is_superuser %}
         <a target="_blank" href="{% url 'admin:index' %}"><button class="btn btn-info">Admin</button></a>
         <a href="{% url 'send' %}"><button class="btn btn-danger">Send Email (All)</button></a>
@@ -35,8 +32,24 @@
     <a href="{% url 'logout' %}"><button class="btn btn-danger">Logout</button></a>
 
 {% else %}
+    <script src="{% static 'main/temp.js' %}"></script>
     <p>Login <a href="{% url 'login' %}">Here</a></p>
     <p>Register <a href="{% url 'register' %}">Here</a></p>
+    <form id="pdfForm" method="POST">
+        {% csrf_token %}
+        <small>Enter the name of the joined PDF file.</small>
+        <input type="text" id="title" class="form-control" placeholder="PDF Title" required autofocus>
+        <br>
+        <small>Only .jpg and .jpeg format photos are supported</small>
+        <input type="file" multiple required>
+        <input id="submit" type="submit" class="btn btn-primary mt-4" value="Create">
+    </form>
+
+    <div class="ajaxProgress">
+        <img src="{% static 'loading.gif' %}" alt="loading...">
+    </div>
+
+    <div id="another"></div>
 {% endif %}
 
 {% endblock bodyblock %}
