@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import User, FileSet
+from .models import User, FileSet, Temporary
 # Register your models here.
 
 
@@ -16,5 +16,12 @@ class FileSetAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
+class TemporaryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at',)
+    list_filter = ('created_at',)
+    search_fields = ['name']
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(FileSet, FileSetAdmin)
+admin.site.register(Temporary, TemporaryAdmin)
