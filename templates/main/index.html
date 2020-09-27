@@ -9,8 +9,10 @@
         <a target="_blank" href="{% url 'admin:index' %}"><button class="btn btn-info">Admin</button></a>
         <a href="{% url 'send' %}"><button class="btn btn-danger">Send Email (All)</button></a>
     {% endif %}
-
-    <a href="{% url 'profile' %}"><button class="btn btn-info">Profile</button></a>
+    <div class="line">
+        <a href="{% url 'profile' %}"><button id="profile" class="btn btn-info">Profile</button></a>
+        <a href="{% url 'logout' %}"><button id="logout" class="btn btn-danger">Logout</button></a>
+    </div>
 
     <form id="pdfForm" method="POST">
         {% csrf_token %}
@@ -27,9 +29,6 @@
     </div>
 
     <div id="another"></div>
-    <br>
-
-    <a href="{% url 'logout' %}"><button class="btn btn-danger">Logout</button></a>
 
 {% else %}
     <script src="{% static 'main/temp.js' %}"></script>
@@ -53,3 +52,10 @@
 {% endif %}
 
 {% endblock bodyblock %}
+
+{% block footerblock %}
+    <footer>
+        <p><b>For any query/problems click <a href="mailto:abdullah.rafi01@northsouth.edu">here</a>!</p>
+        <p><b>© 2020 Copyright: <a style="text-decoration: none;" href="https://pdfjoined.herokuapp.com/">Team PDF Joiner</a></b></p>
+    </footer>
+{% endblock footerblock %}

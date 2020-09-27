@@ -1,5 +1,16 @@
 body {
+  position: relative;
+  min-height: 90vh;
   margin: 5%;
+}
+
+footer {
+  padding: 2%;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  background-color: #17a2b8;
 }
 
 p {
@@ -12,4 +23,20 @@ p {
 
 .ajaxProgress {
   display: none;
+}
+
+.jumbotron {
+  text-align: center;
+}
+
+#video {
+  margin: 5%;
+}
+
+.line {
+  display: inline-block;
+}
+
+.index {
+  width: 100%;
 }
