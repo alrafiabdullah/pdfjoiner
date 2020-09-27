@@ -44,11 +44,27 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("csrfmiddlewaretoken", csrfToken);
     formData.append("credentials", "include");
 
-    const title = $("#title").val();
-
-    $("#submit").hide();
+    $("#pdfForm").hide();
+    $("#please").show();
     $(".ajaxProgress").show();
     $.ajax({
+      xhr: function () {
+        $(".progress").css("display", "block");
+        $("#percent").text("0%");
+        var xhr = new window.XMLHttpRequest();
+        xhr.upload.addEventListener(
+          "progress",
+          function (e) {
+            if (e.lengthComputable) {
+              var percentComplete = e.loaded / e.total;
+              $(".bar").css("width", percentComplete * 100 + "%");
+              $("#percent").text(Math.floor(percentComplete * 100) + "%");
+            }
+          },
+          false
+        );
+        return xhr;
+      },
       type: "POST",
       url: "/success",
       data: formData,
@@ -61,7 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.message === "File") {
           $(".ajaxProgress").hide();
-          $("#submit").show();
+          $("#please").hide();
+          $(".progress").hide();
+          $("#pdfForm").show();
           another.innerHTML = `<div  class="alert alert-danger">
                                 <h3>The title is taken. Please add another title!</h3>
                                 <h5>You can try using your_name+course_id+student_id as file name.</h5>
@@ -69,11 +87,15 @@ document.addEventListener("DOMContentLoaded", () => {
           another.style.display = "block";
         } else if (response.message === "Full") {
           $(".ajaxProgress").hide();
-          $("#submit").show();
+          $("#please").hide();
+          $(".progress").hide();
+          $("#pdfForm").show();
           another.innerHTML = `<h3 class="alert alert-danger">You have reached your limit. Please delete a PDF first!</h3>`;
           another.style.display = "block";
         } else {
           $(".ajaxProgress").hide();
+          $("#please").hide();
+          $(".progress").hide();
           $("#pdfForm").hide();
           const temp = JSON.parse(response.file);
           const tempID = temp[0].pk;

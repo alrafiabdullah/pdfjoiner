@@ -23,6 +23,10 @@
         <input type="file" multiple required>
         <input id="submit" type="submit" class="btn btn-primary mt-4" value="Create">
     </form>
+    <h5 id="please" class="alert alert-info" style="display: none;">Please wait, while we process your images and prepare your PDF!</h5>
+    <div class="progress progress-striped active" style="display: none; padding: 2%;">
+        <div class="bar" style="width: 0%;"><span id="percent"></span></div>
+    </div>
 
     <div class="ajaxProgress">
         <img src="{% static 'loading.gif' %}" alt="loading...">
@@ -43,6 +47,10 @@
         <input type="file" multiple required>
         <input id="submit" type="submit" class="btn btn-primary mt-4" value="Create">
     </form>
+    <h5 id="please" class="alert alert-info" style="display: none;">Please wait, while we process your images and prepare your PDF!</h5>
+    <div class="progress progress-striped active" style="display: none; padding: 2%;">
+        <div class="bar" style="width: 0%;"><span id="percent"></span></div>
+    </div>
 
     <div class="ajaxProgress">
         <img src="{% static 'loading.gif' %}" alt="loading...">
@@ -52,10 +60,3 @@
 {% endif %}
 
 {% endblock bodyblock %}
-
-{% block footerblock %}
-    <footer>
-        <p><b>For any query/problems click <a href="mailto:abdullah.rafi01@northsouth.edu">here</a>!</p>
-        <p><b>© 2020 Copyright: <a style="text-decoration: none;" href="https://pdfjoined.herokuapp.com/">Team PDF Joiner</a></b></p>
-    </footer>
-{% endblock footerblock %}

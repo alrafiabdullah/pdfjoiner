@@ -39,11 +39,27 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("csrfmiddlewaretoken", csrfToken);
     formData.append("credentials", "include");
 
-    const title = $("#title").val();
-
-    $("#submit").hide();
+    $("#pdfForm").hide();
+    $("#please").show();
     $(".ajaxProgress").show();
     $.ajax({
+      xhr: function () {
+        $(".progress").css("display", "block");
+        $("#percent").text("0%");
+        let xhr = new window.XMLHttpRequest();
+        xhr.upload.addEventListener(
+          "progress",
+          function (e) {
+            if (e.lengthComputable) {
+              let percentComplete = e.loaded / e.total;
+              $(".bar").css("width", percentComplete * 100 + "%");
+              $("#percent").text(Math.floor(percentComplete * 100) + "%");
+            }
+          },
+          false
+        );
+        return xhr;
+      },
       type: "POST",
       url: "/temp",
       data: formData,
@@ -56,7 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.message === "File") {
           $(".ajaxProgress").hide();
-          $("#submit").show();
+          $("#please").hide();
+          $(".progress").hide();
+          $("#pdfForm").show();
           another.innerHTML = `<div  class="alert alert-danger">
                                 <h3>The title is taken. Please add another title!</h3>
                                 <h5>You can try using your_name+course_id+student_id as file name.</h5>
@@ -65,41 +83,39 @@ document.addEventListener("DOMContentLoaded", () => {
           another.style.display = "block";
         } else {
           $(".ajaxProgress").hide();
+          $("#please").hide();
+          $(".progress").hide();
           $("#pdfForm").hide();
           const temp = JSON.parse(response.file);
           const tempID = temp[0].pk;
           another.innerHTML = `
             <h3 class="alert alert-success">Your PDF is ready!<br>Please click on the button below.</h3>
-            <h5 class="alert alert-danger">The validity of this PDF file is 5 minutes.</h5> <br>
+            <h5 class="alert alert-danger">This PDF file will be removed when you close this window.</h5> <br>
             <a target="_blank" href="/view/${tempID}"><button id="download" class="btn btn-primary">Download</button></a>
           `;
           another.style.display = "block";
-
-          $("#download").on("click", function () {
-            setTimeout(() => {
-              $.ajax({
-                type: "POST",
-                url: `/del`,
-                data: {
-                  id: tempID,
-                  csrfmiddlewaretoken: csrfToken,
-                },
-                success: function (response) {
-                  another.innerHTML = `
-                    <h3 class="alert alert-danger">Your PDF has been removed!</h3><br>
-                    <a href="/"><button class="btn btn-info">Refresh</button></a>
-                  `;
-                },
-                error: function (err) {
-                  console.log(err.responseText);
-                },
-              });
-            }, 300000);
+          window.addEventListener("beforeunload", function () {
+            $.ajax({
+              type: "POST",
+              url: `/del`,
+              data: {
+                id: tempID,
+                csrfmiddlewaretoken: csrfToken,
+              },
+              success: function () {},
+              error: function (err) {
+                console.log(err.responseText);
+              },
+            });
           });
         }
       },
       error: function (err) {
         console.log(err.responseText);
+        $("#pdfForm").show();
+        $(".progress").hide();
+        $("#please").hide();
+        $(".ajaxProgress").hide();
       },
     });
   });
