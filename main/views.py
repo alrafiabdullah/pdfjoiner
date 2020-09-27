@@ -12,6 +12,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core import serializers
+from django.contrib.auth.decorators import login_required
 
 from .models import User, FileSet, Temporary
 
@@ -42,6 +43,7 @@ def user_login(request):
     return render(request, "main/login.html")
 
 
+@login_required
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('login'))
@@ -80,6 +82,7 @@ def user_register(request):
     return render(request, "main/register.html")
 
 
+@login_required
 def user_pdf(request):
     all_pdf = FileSet.objects.filter(user=request.user).order_by('-created_at')
 
@@ -104,6 +107,7 @@ def user_pdf(request):
     })
 
 
+@login_required
 def pdf_delete(request, id):
 
     pdf = FileSet.objects.get(id=id)
@@ -127,10 +131,14 @@ def temp_delete(request):
     }, content_type="application/json", status=200)
 
 
+@login_required
 def pdf_view(request, id):
     pdf = get_object_or_404(FileSet, id=id)
-    file_name = pdf.name
-    return FileResponse(open(f'mediafiles/{file_name}.pdf', 'rb'))
+    if pdf.user == request.user:
+        pdf = get_object_or_404(FileSet, id=id)
+        file_name = pdf.name
+        return FileResponse(open(f'mediafiles/{file_name}.pdf', 'rb'))
+    return render(request, "main/index.html")
 
 
 def temp_view(request, id):
@@ -139,6 +147,7 @@ def temp_view(request, id):
     return FileResponse(open(f'mediafiles/others/{file_name}.pdf', 'rb'))
 
 
+@login_required
 def user_profile(request):
     user_pdfs = FileSet.objects.filter(user=request.user)
     if request.method == "POST":
@@ -156,6 +165,7 @@ def user_profile(request):
     })
 
 
+@login_required
 def user_edit(request):
     if request.method == "POST":
         user = request.user
@@ -167,6 +177,7 @@ def user_edit(request):
     return render(request, "main/edit.html")
 
 
+@login_required
 def send_mail(request):
     all_email = []
     all_user = User.objects.all()
