@@ -17,7 +17,11 @@
             {% endif %}
             {% comment %} <li>Sl No. <b>{{ forloop.counter }}</b></li> {% endcomment %}
             <li>Download Link: <a target="_blank" href="{% url 'view' pdf.id %}"><b>{{pdf.name}}</b></a></li>
-            <li>Created <b>{{pdf.created_at | timesince}}</b> ago.</li>
+            {% if pdf.created_at|days_ago:7 %}
+                <li>Created <b style="color: purple;">{{pdf.created_at | timesince}}</b> ago.</li>
+            {% else %}
+                <li>Created <b>{{pdf.created_at | timesince}}</b> ago.</li>
+            {% endif %}
             <li><a href="{% url 'delete' pdf.id %}"><button class="btn btn-danger">Delete</button></a></li>
         </ul>
         {% ifnotequal forloop.revcounter 1 %}
