@@ -1,0 +1,23 @@
+{% extends 'main/base.html' %}
+
+{% block bodyblock %}
+    <div class="jumbotron" id="customError">
+        <h1>This is a 500 page!</h1> <br>
+        <h3>Seems like there's been a problem from the other side and it is being investigated.</h3>
+        <h5>Please come back and try again later. Thank you!</h5> <br>
+        <a href="{% url 'index' %}"><button class="btn btn-danger">Refresh</button></a> <br> <br>
+        <h5>In the interim, you can enjoy this video!</h5>
+        <div id="video">
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item" allow="encrypted-media" src="https://www.youtube.com/embed/4m-NbflnvTs" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+{% endblock bodyblock %}
+
+{% block footerblock %}
+    <footer>
+        <p><b>For any query/problems click <a href="mailto:abdullah.rafi01@northsouth.edu">here</a>!</p>
+        <p><b>© 2020 Copyright: <a style="text-decoration: none;" href="https://pdfjoined.herokuapp.com/">Team PDF Joiner</a></b></p>
+    </footer>
+{% endblock footerblock %}

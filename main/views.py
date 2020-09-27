@@ -22,6 +22,14 @@ import time
 # Create your views here.
 
 
+def error_404_view(request, exception):
+    return render(request, 'main/404.html')
+
+
+def error_500_view(request):
+    return render(request, 'main/500.html')
+
+
 def index(request):
     csrf_token = get_token(request)
     return render(request, 'main/index.html')
