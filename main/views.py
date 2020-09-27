@@ -109,13 +109,14 @@ def user_pdf(request):
 
 @login_required
 def pdf_delete(request, id):
-
     pdf = FileSet.objects.get(id=id)
-    if os.path.exists(f'mediafiles/{pdf.name}.pdf'):
-        os.remove(f'mediafiles/{pdf.name}.pdf')
-    pdf.delete()
+    if pdf.user == request.user:
+        if os.path.exists(f'mediafiles/{pdf.name}.pdf'):
+            os.remove(f'mediafiles/{pdf.name}.pdf')
+        pdf.delete()
+        return HttpResponseRedirect(reverse('pdfs'))
 
-    return HttpResponseRedirect(reverse('pdfs'))
+    return render(request, "main/index.html")
 
 
 def temp_delete(request):
