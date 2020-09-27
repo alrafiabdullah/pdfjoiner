@@ -15,6 +15,7 @@
     {% else %}
         <h5>Total PDF Count: <a href="{% url 'pdfs' %}"><strong>{{ user_pdfs|length }}/10</strong></a></h5>
     {% endif %}
+    <a id="checkPDF" href="{% url 'pdfs' %}"><button class="btn btn-info">Check your PDF Here</button></a>
     {% if request.user.first_name %}
         <a href="{% url 'edit' %}"><button class="btn btn-info">Edit Profile</button></a> <br>
         First Name: {{ request.user.first_name }} <br>
